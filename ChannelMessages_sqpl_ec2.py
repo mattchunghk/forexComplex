@@ -33,8 +33,10 @@ conn = psycopg2.connect(
 path = "C:\Program Files\Vantage International MT5/terminal64.exe"
 # server = 'Pepperstone-Demo'
 server = 'VantageInternational-Demo'
-mt5_username = os.getenv('mt5_vantage_demo_username')
-password = os.getenv('mt5_vantage_demo_password')
+# mt5_username = os.getenv('mt5_vantage_demo_username')
+# password = os.getenv('mt5_vantage_demo_password')
+mt5_username = os.getenv('mt5_vantage_demo_2_username')
+password = os.getenv('mt5_vantage_demo_2_password')
 # mt5_username = os.getenv('mt5_vantage_demo_username')
 # password = os.getenv('mt5_vantage_demo_password')
 
