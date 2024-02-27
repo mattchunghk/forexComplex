@@ -1,0 +1,8 @@
+myenv
+env39
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.session
+.env
+*.session-journal
