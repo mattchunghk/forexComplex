@@ -126,12 +126,13 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
         print('message: ', message)
         print('edited_msg: ', message.id)
         channel_id = message.peer_id.channel_id
+        ms_id = int(str(channel_id) + str(message.id))
         if  channel_id == 1994209728:
         # Process the new message
             if message.text and "SIGNAL ALERT" in message.text:
                 print(message)
                 channel_id = message.peer_id.channel_id
-                ms_id = int(str(channel_id) + str(message.id))
+                # ms_id = int(str(channel_id) + str(message.id))
                 message.text = re.sub(r'(?<!\d)(\.\d+)', r'0\1', message.text)
                 price_data = re.findall(r'\d+\.\d+', message.text)
                 converted_data = [float(item) if "." in item else int(item) for item in price_data]
@@ -242,11 +243,12 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
         print('message: ', message)
         print('edited_msg: ', message.id)
         channel_id = message.peer_id.channel_id
+        ms_id = int(str(channel_id) + str(message.id))
         if  channel_id == 1994209728:
          # Process the new message
             if message.text and "SIGNAL ALERT" in message.text:
                 # print(message.text)
-                ms_id = int(str(channel_id) + str(message.id))
+                # ms_id = int(str(channel_id) + str(message.id))
                 message.text = re.sub(r'(?<!\d)(\.\d+)', r'0\1', message.text)
                 price_data = re.findall(r'\d+\.\d+', message.text)
                 converted_data = [float(item) if "." in item else int(item) for item in price_data]
