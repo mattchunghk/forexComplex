@@ -129,15 +129,21 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
         print('message: ', message)
         print('edited_msg: ', message.id)
         channel_id = message.peer_id.channel_id
-        if  channel_id == 1994209728:
+        ms_id = str(channel_id) + str(message.id)
+        if  channel_id == 1994209728 or channel_id == 1220837618:
         # Process the new message
             if message.text and "SIGNAL ALERT" in message.text:
                 print(message)
                 channel_id = message.peer_id.channel_id
-                ms_id = int(str(channel_id) + str(message.id))
+                org_message = message.text
                 message.text = re.sub(r'(?<!\d)(\.\d+)', r'0\1', message.text)
                 price_data = re.findall(r'\d+\.\d+', message.text)
                 converted_data = [float(item) if "." in item else int(item) for item in price_data]
+                if len(price_data) == 0:
+                    price_data = re.findall(r'\b\d+\b', org_message)
+                    print('price_data: ', price_data)
+                    converted_data = [float(num) for num in price_data]
+                
                 print('converted_data: ', converted_data)
     
 
@@ -147,7 +153,7 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
                 lot = 0.5
                 lot_size = 100000
                 trade_volume = lot * lot_size
-                if "TP1" in message.text and "TP2" in message.text and "TP3" in message.text :
+                if "TP1" in org_message and "TP2" in org_message and "TP3" in org_message :
                     order_price = converted_data[0]
                     tp1 = converted_data[1]
                     tp2 = converted_data[2]
@@ -245,14 +251,22 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
         print('message: ', message)
         print('edited_msg: ', message.id)
         channel_id = message.peer_id.channel_id
-        if  channel_id == 1994209728:
+        ms_id = str(channel_id) + str(message.id)
+        if  channel_id == 1994209728 or channel_id == 1220837618:
          # Process the new message
             if message.text and "SIGNAL ALERT" in message.text:
-                # print(message.text)
-                ms_id = int(str(channel_id) + str(message.id))
+                print(message)
+                channel_id = message.peer_id.channel_id
+                
+                org_message = message.text
                 message.text = re.sub(r'(?<!\d)(\.\d+)', r'0\1', message.text)
                 price_data = re.findall(r'\d+\.\d+', message.text)
                 converted_data = [float(item) if "." in item else int(item) for item in price_data]
+                if len(price_data) == 0:
+                    price_data = re.findall(r'\b\d+\b', org_message)
+                    print('price_data: ', price_data)
+                    converted_data = [float(num) for num in price_data]
+                
                 print('converted_data: ', converted_data)
     
 
@@ -262,7 +276,7 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
                 lot = 0.5
                 lot_size = 100000
                 trade_volume = lot * lot_size
-                if "TP1" in message.text and "TP2" in message.text and "TP3" in message.text :
+                if "TP1" in org_message and "TP2" in org_message and "TP3" in org_message :
                     order_price = converted_data[0]
                     tp1 = converted_data[1]
                     tp2 = converted_data[2]
