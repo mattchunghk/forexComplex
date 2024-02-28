@@ -1,7 +1,6 @@
 
 from datetime import datetime
-
-from MetaTrader5 import mt5
+import MetaTrader5 as mt5
 from telethon.sync import TelegramClient, events
 import os
 from telethon import TelegramClient
