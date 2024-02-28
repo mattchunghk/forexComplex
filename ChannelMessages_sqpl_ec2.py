@@ -28,7 +28,7 @@ cur = conn.cursor()
 
 
 path = "C:\Program Files\Vantage International MT5/terminal64.exe"
-path = "/Users/mattchung/.wine/drive_c/Program Files/Pepperstone MetaTrader 5/terminal64.exe"
+# path = "/Users/mattchung/.wine/drive_c/Program Files/Pepperstone MetaTrader 5/terminal64.exe"
 server = 'VantageInternational-Demo'
 mt5_username = os.getenv('mt5_vantage_demo_2_username')
 password = os.getenv('mt5_vantage_demo_2_password')
