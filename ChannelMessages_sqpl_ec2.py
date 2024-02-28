@@ -174,6 +174,7 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
             
     @client.on(events.MessageEdited(chats=channel_id_list))
     async def handle_edited_message(event):
+        if event.message.reply_to_msg_id == None:
             processed_msg = tg_group_selector(event)
             
             ms_id = processed_msg["ms_id"]
