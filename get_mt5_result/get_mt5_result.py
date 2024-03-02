@@ -69,7 +69,7 @@ def sum_profits_by_comment(trades):
     return results
 
 def get_result(message):
-    print('message: ', message)
+    # print('message: ', message)
     timezone = pytz.utc
 
     if "NOW" == message.upper():
