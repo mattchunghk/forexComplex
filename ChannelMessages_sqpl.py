@@ -30,7 +30,7 @@ conn = psycopg2.connect(
     user="postgres",
     password="postgres"
 )
-
+print("")
 
 
 from mt5linux import MetaTrader5
