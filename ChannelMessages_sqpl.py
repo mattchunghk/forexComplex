@@ -2,6 +2,7 @@
 import json
 import re
 from datetime import datetime
+import time
 
 # from MetaTrader5 import mt5
 from telethon.sync import TelegramClient, events
@@ -9,6 +10,7 @@ from telethon.tl.types import PeerChannel
 import os
 from telethon import TelegramClient
 from dotenv import load_dotenv
+from get_mt5_result.get_mt5_result import get_result
 
 from group_select.group_select import tg_group_selector
 from utils.inert_query import insert_msg_trade
@@ -115,18 +117,29 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
     
     #*channel_id_list = [TFXC PREMIUM, TFXC SIGNALS, TFXC CHAT, Test Private]
     # channel_id_list = [1220837618,1541002369,1675658808,1994209728]
-    channel_id_list = [1220837618,1994209728]
+    channel_id_list = [1220837618,199420972,1967274081,1327949777,1327949777,2095861920]
 
     # Get information about the channel
     # channel = client.get_entity(channel_username)
+    # client.send_message(-1001994209728, 'Hello, group!')
+    # while  True:
+    #     client.send_message(-1001994209728, "message")
+    #     time.sleep(1)
 
     # @client.on(events.NewMessage(chats=channel))
     # @client.on(events.NewMessage(PeerChannel(channel_id=channel_id_list[channel_index])))
     @client.on(events.NewMessage(chats=channel_id_list))
     async def handle_new_message(event):
+        
+        channel_id = event.message.peer_id.channel_id
+        message = event.message.text
+        if channel_id == 2095861920:
+            result = get_result(message)
+            await client.send_message(-1002095861920, result)
+
         # print('event: ', event)
 
-        if event.message.reply_to_msg_id == None:
+        if event.message.reply_to_msg_id == None and channel_id != 2095861920:
             processed_msg = tg_group_selector(event)
             print('processed_msg: ', processed_msg)
             
@@ -191,7 +204,8 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
             
     @client.on(events.MessageEdited(chats=channel_id_list))
     async def handle_edited_message(event):
-        if event.message.reply_to_msg_id == None:
+        channel_id = event.message.peer_id.channel_id
+        if event.message.reply_to_msg_id == None and channel_id != 2095861920:
             processed_msg = tg_group_selector(event)
             
             ms_id = processed_msg["ms_id"]
