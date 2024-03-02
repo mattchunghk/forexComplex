@@ -4,13 +4,13 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-from mt5linux import MetaTrader5
-mt5 = MetaTrader5(
-    host = 'localhost',
-    # host = os.getenv('mt5_host'),
-    port = 18812      
-)  
-# import MetaTrader5 as mt5
+# from mt5linux import MetaTrader5
+# mt5 = MetaTrader5(
+#     host = 'localhost',
+#     # host = os.getenv('mt5_host'),
+#     port = 18812      
+# )  
+import MetaTrader5 as mt5
 
 path = "C:\Program Files\Vantage International MT5/terminal64.exe"
 # path = "/home/ubuntu/.wine/drive_c/Program Files/Pepperstone MetaTrader 5/terminal64.exe"
