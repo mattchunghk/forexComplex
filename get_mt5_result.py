@@ -1,17 +1,21 @@
 from datetime import datetime, timedelta
 import pytz
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
-# from mt5linux import MetaTrader5
-# mt5 = MetaTrader5(
-#     host = 'localhost',
-#     # host = os.getenv('mt5_host'),
-#     port = 18812      
-# )  
-import MetaTrader5 as mt5
+from mt5linux import MetaTrader5
+mt5 = MetaTrader5(
+    host = 'localhost',
+    # host = os.getenv('mt5_host'),
+    port = 18812      
+)  
+# import MetaTrader5 as mt5
 
 path = "C:\Program Files\Vantage International MT5/terminal64.exe"
+# path = "/home/ubuntu/.wine/drive_c/Program Files/Pepperstone MetaTrader 5/terminal64.exe"
 # path = "/Users/mattchung/.wine/drive_c/Program Files/Pepperstone MetaTrader 5/terminal64.exe"
+# server = 'Pepperstone-Demo'
 server = 'VantageInternational-Demo'
 mt5_username = os.getenv('mt5_vantage_demo_2_username')
 password = os.getenv('mt5_vantage_demo_2_password')
@@ -51,8 +55,8 @@ print('mt5.initialize(): ', mt5.initialize())
 # mt5.terminal_info()
 # print('mt5.terminal_info(): ', mt5.terminal_info())
 # Set time zone to UTC for consistency
-# timezone = pytz.utc
-timezone = pytz.timezone("Asia/Hong_Kong")
+timezone = pytz.utc
+# timezone = pytz.timezone("Asia/Hong_Kong")
 
 # Define the period for last week
 today = datetime.now(timezone)
