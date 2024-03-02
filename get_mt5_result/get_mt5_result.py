@@ -2,12 +2,9 @@ from datetime import datetime, timedelta
 import re
 import pytz
 import os
-from dotenv import load_dotenv
-# Get the path to the directory this file is in
-BASEDIR = os.path.dirname(__file__)
+from dotenv import load_dotenv, find_dotenv
 
-# Connect the path with your '.env' file name
-load_dotenv(os.path.join(BASEDIR, '.env'))
+load_dotenv(find_dotenv())
 
 # from mt5linux import MetaTrader5
 # mt5 = MetaTrader5(
