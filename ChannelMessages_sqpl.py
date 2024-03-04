@@ -10,6 +10,7 @@ from telethon.tl.types import PeerChannel
 import os
 from telethon import TelegramClient
 from dotenv import load_dotenv
+load_dotenv()
 from get_mt5_result.get_mt5_result_local import get_result
 
 
@@ -50,8 +51,8 @@ server = 'VantageInternational-Demo'
 # password = os.getenv('mt5_vantage_demo_2_password')
 mt5_username = os.getenv('mt5_vantage_demo_username')
 password = os.getenv('mt5_vantage_demo_password')
-mt5_username = os.getenv('mt5_pepperstone_username')
-password = os.getenv('mt5_pepperstone_password')
+# mt5_username = os.getenv('mt5_pepperstone_username')
+# password = os.getenv('mt5_pepperstone_password')
 
 deviation = 10
 # def start_mt5(username, password, server, path):
@@ -123,7 +124,7 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
     
     #*channel_id_list = [TFXC PREMIUM, TFXC SIGNALS, TFXC CHAT, Test Private]
     # channel_id_list = [1220837618,1541002369,1675658808,1994209728]
-    channel_id_list = [1220837618,199420972,1967274081,1327949777,1327949777,2095861920]
+    channel_id_list = [1994209728,2095861920,1220837618,1967274081,1327949777,1821216397]
 
     # Get information about the channel
     # channel = client.get_entity(channel_username)
@@ -136,6 +137,7 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
     # @client.on(events.NewMessage(PeerChannel(channel_id=channel_id_list[channel_index])))
     @client.on(events.NewMessage(chats=channel_id_list))
     async def handle_new_message(event):
+
         
         channel_id = event.message.peer_id.channel_id
         message = event.message.text
@@ -147,7 +149,7 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
 
         if event.message.reply_to_msg_id == None and channel_id != 2095861920:
             processed_msg = tg_group_selector(event)
-            if processed_msg :
+            if processed_msg and processed_msg['close']==False:
             
                 ms_id = processed_msg["ms_id"]
                 order_type = processed_msg["order_type"]
@@ -160,7 +162,9 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
                 tp2 = processed_msg["tp2"]
                 tp3 = processed_msg["tp3"]
                 stop_loss = processed_msg["stop_loss"]
+                magic = processed_msg["magic"]
                 comment=processed_msg["comment"]
+                reply_to_msg_id = processed_msg["reply_to_msg_id"]
                 
                 start_mt5()
                 connect()
@@ -183,7 +187,7 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
                     "sl": stop_loss,
                     "tp": tp1,
                     "deviation": 10,
-                    "magic": 234000,
+                    "magic": magic,
                     "comment": comment,
                     "type_time": mt5.ORDER_TIME_GTC,
                     "type_filling": mt5.ORDER_FILLING_IOC,
@@ -207,6 +211,54 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
 
                 # Shut down connection to MetaTrader 5
                 mt5.shutdown()
+        elif event.message.reply_to_msg_id  and channel_id != 2095861920:
+            processed_msg = tg_group_selector(event)
+            if processed_msg and processed_msg['close']:
+                start_mt5()
+                connect()
+                reply_to_msg_id = processed_msg["reply_to_msg_id"]
+                ms_id = str(channel_id) + str(reply_to_msg_id)
+                result = get_order_id_by_msg_id(conn, cur, ms_id)  # Fetch the result from the query
+                print('result: ', result)
+
+                if result is not None:
+                    ticket = int(result)
+                    position = mt5.positions_get(ticket=ticket)
+                    print('position: ', position)
+                    if position is None or len(position) == 0:
+                        print("No position with ticket #", ticket)
+                    else:
+                        position = position[0]
+                        symbol = position.symbol
+                        lot = position.volume
+                        position_type = position.type
+                        price = mt5.symbol_info_tick(symbol).ask if position_type == mt5.ORDER_TYPE_BUY else mt5.symbol_info_tick(symbol).bid
+
+                        # Prepare request for closing position
+                        close_request = {
+                            "action": mt5.TRADE_ACTION_DEAL,
+                            "symbol": symbol,
+                            "volume": lot,
+                            "type": mt5.ORDER_TYPE_SELL if position_type == mt5.ORDER_TYPE_BUY else mt5.ORDER_TYPE_BUY,
+                            "position": int(ticket),
+                            "price": price,
+                            "magic": magic,
+                            "comment": comment,
+                            "type_time": mt5.ORDER_TIME_GTC,
+                            "type_filling": mt5.ORDER_FILLING_IOC,
+                        }
+
+                        # Send close request
+                        result = mt5.order_send(close_request)
+                        if result.retcode != mt5.TRADE_RETCODE_DONE:
+                            print("Failed to close position with ticket #", ticket, "error code =", result.retcode)
+                        else:
+                            print("Position with ticket #", ticket, "closed successfully")
+
+                    # Shutdown the MT5 connection
+                    mt5.shutdown()
+                    
+                    
             
     @client.on(events.MessageEdited(chats=channel_id_list))
     async def handle_edited_message(event):

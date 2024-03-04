@@ -62,9 +62,22 @@ def TFXC_msg_processor(event, lot=0.5):
             "tp2" : tp2,
             "tp3" : tp3,
             "stop_loss" : stop_loss,
-            "comment":comment
+            "magic":1,
+            "comment":comment,
+            "close": False,
+            "reply_to_msg_id" : None
         }
         
         return result
-            
+    elif  message.text and ("CLOSE" in (message.text).upper() or "HIT" in (message.text).upper()): 
+    # elif  message.text and "close" in message.text: 
+        print('message.text: ', message.text.upper())
+        print('event: ', event)
+        # Close position
+        if event.message.reply_to_msg_id:
+            result={
+                "close": True,
+                "reply_to_msg_id" : event.message.reply_to_msg_id
+            } 
+            return result
             

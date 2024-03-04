@@ -52,24 +52,35 @@ def connect():
     mt5.initialize()
     
 start_mt5()
-connect()
-mt5.initialize()
-print('mt5.initialize(): ', mt5.initialize())
+
+# Define the mapping of magic numbers to names
+magic_to_name_mapping = {
+    1: 'TFXC',
+    2: 'PIPXPERT',
+    3: 'FXGoldenCircle',
+    4: 'ASTRATEQ'
+    # Add more mappings here if needed
+}
+def magic_number_to_name(magic_number):
+    # Return the name corresponding to the magic number, or "Unknown" if not found
+    return magic_to_name_mapping.get(magic_number, "testing")
 
 # Function to sum profits by comment
-def sum_profits_by_comment(trades):
+def sum_profits_by_name(trades):
     results = {}
     for trade in trades:
-        comment = trade.comment
+        # print('trade: ', trade)
+        magic_number = trade.magic  # Assuming that 'magic' is an attribute of 'trade'
+        name = magic_number_to_name(magic_number)  # Get the name corresponding to the magic number
         profit = trade.profit
-        if comment in results:
-            results[comment] += profit
+        if name in results:
+            results[name] += profit
         else:
-            results[comment] = profit
+            results[name] = profit
     return results
 
 def get_result(message):
-    # print('message: ', message)
+    print('message: ', message)
     timezone = pytz.utc
 
     if "NOW" == message.upper():
@@ -94,34 +105,39 @@ def get_result(message):
     # Convert start and end dates to Unix timestamps
     start_timestamp = int(start.timestamp())
     end_timestamp = int(end.timestamp())
+    
+    start_mt5()
+
+ 
 
     # Retrieve trade history for the specified period and overall
-    trades_period = mt5.history_deals_get(start_timestamp, end_timestamp)
-    # all_trades = mt5.history_deals_get()
-    # print('all_trades: ', all_trades)
+    trades_period =  mt5.history_deals_get(start_timestamp, end_timestamp)
+
+    # all_trades =  mt5.history_deals_get(start_timestamp, end_timestamp)
+
     message = ""
 
-    if trades_period is None:# or all_trades is None:
+    if trades_period is None :
         print("No trades found or an error occurred.")
         message = "No trades in this period"
         mt5.shutdown()
     else:
         # Sum profits for the specified period and overall
-        profits_period_by_comment = sum_profits_by_comment(trades_period)
-        # overall_profits_by_comment = sum_profits_by_comment(all_trades)
+        profits_period_by_magic_number = sum_profits_by_name(trades_period)
+        # overall_profits_by_magic_number = sum_profits_by_name(all_trades)
 
         # Sort the results by profit from highest to lowest
-        sorted_profits_period = dict(sorted(profits_period_by_comment.items(), key=lambda item: item[1], reverse=True))
-        # sorted_overall_profits = dict(sorted(overall_profits_by_comment.items(), key=lambda item: item[1], reverse=True))
+        sorted_profits_period = dict(sorted(profits_period_by_magic_number.items(), key=lambda item: item[1], reverse=True))
+        # sorted_overall_profits = dict(sorted(overall_profits_by_magic_number.items(), key=lambda item: item[1], reverse=True))
 
-        # Prepare the results in a message format
-        message = "Profits for the specified period by comment (sorted):\n"
-        for comment, profit in sorted_profits_period.items():
-            message += f"{comment}: {profit}\n"
+       # Prepare the results in a message format
+        message = "Profits by TG Group:\n"
+        for group_name, profit in sorted_profits_period.items():
+            message += f"{group_name}: {profit}\n"
 
-        # message += "\nOverall profits by comment (sorted):\n"
-        # for comment, profit in sorted_overall_profits.items():
-        #     message += f"{comment}: {profit}\n"
+        # message += "\nOverall profits by magic number:\n"
+        # for magic_number, profit in sorted_overall_profits.items():
+        #     message += f"{magic_number}: {profit}\n"
 
         # Shut down the MT5 connection
         mt5.shutdown()

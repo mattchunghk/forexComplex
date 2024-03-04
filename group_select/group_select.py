@@ -12,7 +12,7 @@ def tg_group_selector(event):
     lot = 0.5
     
     #TFXC
-    if  channel_id == 1220837618 :
+    if  channel_id == 1220837618:
         return TFXC_msg_processor(event,lot)
     
     #ASTRATEQ
@@ -23,6 +23,6 @@ def tg_group_selector(event):
     if  channel_id == 1327949777 :
         return FXGoldenCircle_msg_processor(event,lot)
     
-    #ASTRATEQ
-    if  channel_id == 1327949777 or channel_id == 1994209728:
+    #PIPXPERT
+    if  channel_id == 1821216397  or channel_id == 1994209728:
         return PIPXPERT_msg_processor(event,lot)

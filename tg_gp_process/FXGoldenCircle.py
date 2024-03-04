@@ -62,7 +62,10 @@ def FXGoldenCircle_msg_processor(event, lot=0.5):
             "tp2" : tp2,
             "tp3" : tp3,
             "stop_loss" : stop_loss,
-            "comment":comment
+            "magic":3,
+            "comment":comment,
+            "close": False,
+            "reply_to_msg_id" : None
         }
         
         return result
