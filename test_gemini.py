@@ -5,7 +5,10 @@ import google.generativeai as genai
 
 from IPython.display import display
 from IPython.display import Markdown
-
+import os
+from dotenv import load_dotenv
+load_dotenv()
+GOOGLE_API_KEY = os.getenv('gemini_API')
 
 def to_markdown(text):
   text = text.replace('•', '  *')
@@ -16,7 +19,6 @@ def to_markdown(text):
 # from google.colab import userdata
 
 # Or use `os.getenv('GOOGLE_API_KEY')` to fetch an environment variable.
-GOOGLE_API_KEY="AIzaSyCJ8gf2HqZgYCmQ8VPL1Zku7g1NIsFia4A"
 
 genai.configure(api_key=GOOGLE_API_KEY)
 
