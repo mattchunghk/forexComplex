@@ -9,7 +9,7 @@ def PIPXPERT_msg_processor(event, lot=0.5):
     channel_id = message.peer_id.channel_id
     ms_id = str(channel_id) + str(message.id)
     # Process the new message
-    if message.text and "Direction" in message.text and "SL" in message.text:
+    if message.text and "TP1" in message.text and "SL" in message.text and "TP2" in message.text and "TP3" in message.text:
         print(message)
         channel_id = message.peer_id.channel_id
         org_message = message.text
