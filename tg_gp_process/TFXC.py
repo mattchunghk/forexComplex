@@ -76,6 +76,7 @@ def TFXC_msg_processor(event, lot=0.5):
         # Close position
         if event.message.reply_to_msg_id:
             result={
+                'magic':1,
                 "close": True,
                 "reply_to_msg_id" : event.message.reply_to_msg_id
             } 

@@ -197,7 +197,11 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
                 connect()
                 reply_to_msg_id = processed_msg["reply_to_msg_id"]
                 ms_id = str(channel_id) + str(reply_to_msg_id)
+                magic = processed_msg["magic"]
+                comment=processed_msg["comment"]
                 result = get_order_id_by_msg_id(conn, cur, ms_id)  # Fetch the result from the query
+                
+                
                 print('result: ', result)
 
                 if result is not None:
