@@ -20,10 +20,10 @@ path = "C:\Program Files\Vantage International MT5/terminal64.exe"
 # path = "/Users/mattchung/.wine/drive_c/Program Files/Pepperstone MetaTrader 5/terminal64.exe"
 # server = 'Pepperstone-Demo'
 server = 'VantageInternational-Demo'
-mt5_username = os.getenv('mt5_vantage_demo_2_username')
-password = os.getenv('mt5_vantage_demo_2_password')
-# mt5_username = os.getenv('mt5_vantage_demo_username')
-# password = os.getenv('mt5_vantage_demo_password')
+# mt5_username = os.getenv('mt5_vantage_demo_2_username')
+# password = os.getenv('mt5_vantage_demo_2_password')
+mt5_username = os.getenv('mt5_vantage_demo_username')
+password = os.getenv('mt5_vantage_demo_password')
 
 deviation = 10
 # def start_mt5(username, password, server, path):
@@ -59,7 +59,8 @@ magic_to_name_mapping = {
     2: 'PIPXPERT',
     3: 'FXGoldenCircle',
     4: 'ASTRATEQ',
-    5: 'ASTRATEQ(Rev)'
+    5: 'ASTRATEQ(Rev)',
+    6: 'TFXC(Rev)'
     # Add more mappings here if needed
 }
 def magic_number_to_name(magic_number):
@@ -85,7 +86,7 @@ def get_result(message):
     timezone = pytz.utc
 
     if "NOW" == message.upper():
-        today = datetime.now(timezone)
+        today = datetime.now(timezone) + timedelta(days=1)
         start = today - timedelta(days=today.weekday() + 7)
         print('start: ', start)
         end = today

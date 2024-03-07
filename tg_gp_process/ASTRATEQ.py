@@ -59,101 +59,35 @@ def ASTRATEQ_msg_processor(event, lot=0.5):
             "stop_loss" : stop_loss,
             "magic":4,
             "comment":comment,
-            "close": False,
+            "action": "order",
             "reply_to_msg_id" : None
         }
         
         return result
+    elif  message.text and ("CLOSE" in (message.text).upper()): 
+    # elif  message.text and "close" in message.text: 
+        print('message.text: ', message.text.upper())
+        print('event: ', event)
+        # Close position
+        if event.message.reply_to_msg_id:
+            result={
+                'magic':4,
+                "action": "close",
+                "comment": comment,
+                "reply_to_msg_id" : event.message.reply_to_msg_id
+            } 
+            return result
+    elif  message.text and ("BREAKEVEN" in (message.text).upper()): 
+    # elif  message.text and "close" in message.text: 
+        print('message.text: ', message.text.upper())
+        print('event: ', event)
+        # Close position
+        if event.message.reply_to_msg_id:
+            result={
+                'magic':4,
+                "action": "be",
+                "comment": comment,
+                "reply_to_msg_id" : event.message.reply_to_msg_id
+            } 
+            return result
     
-    
-if  __name__ == '__main__':
-
-
-    class PeerChannel:
-        def __init__(self, channel_id):
-            self.channel_id = channel_id
-
-    class MessageEntityBold:
-        def __init__(self, offset=0, length=0):
-            self.offset = offset
-            self.length = length
-
-    class Message:
-        def __init__(self, id=0, peer_id=None, date=datetime.datetime.now(datetime.timezone.utc), 
-                    message='', out=False, mentioned=False, media_unread=False, silent=False, 
-                    post=False, from_scheduled=False, legacy=False, edit_hide=False, pinned=False, 
-                    noforwards=False, invert_media=False, from_id=None, saved_peer_id=None, 
-                    fwd_from=None, via_bot_id=None, reply_to=None, media=None, reply_markup=None, 
-                    entities=None, views=0, forwards=0, replies=None, edit_date=None, 
-                    post_author=None, grouped_id=None, reactions=None, restriction_reason=None, 
-                    ttl_period=None):
-            if entities is None:
-                entities = []
-            if restriction_reason is None:
-                restriction_reason = []
-            self.id = id
-            self.peer_id = peer_id  # Must be provided, no default value
-            self.date = date
-            self.message = message
-            self.out = out
-            self.mentioned = mentioned
-            self.media_unread = media_unread
-            self.silent = silent
-            self.post = post
-            self.from_scheduled = from_scheduled
-            self.legacy = legacy
-            self.edit_hide = edit_hide
-            self.pinned = pinned
-            self.noforwards = noforwards
-            self.invert_media = invert_media
-            self.from_id = from_id
-            self.saved_peer_id = saved_peer_id
-            self.fwd_from = fwd_from
-            self.via_bot_id = via_bot_id
-            self.reply_to = reply_to
-            self.media = media
-            self.reply_markup = reply_markup
-            self.entities = entities
-            self.views = views
-            self.forwards = forwards
-            self.replies = replies
-            self.edit_date = edit_date
-            self.post_author = post_author
-            self.grouped_id = grouped_id
-            self.reactions = reactions
-            self.restriction_reason = restriction_reason
-            self.ttl_period = ttl_period
-
-    class UpdateNewChannelMessage:
-        def __init__(self, message=None, pts=0, pts_count=0):
-            if message is None:
-                message = Message(peer_id=PeerChannel(channel_id=0))  # Default peer_id must be provided
-            self.message = message
-            self.pts = pts
-            self.pts_count = pts_count
-
-    class NewMessageEvent:
-        def __init__(self, original_update=None, pattern_match=None, message=None):
-            if original_update is None:
-                original_update = UpdateNewChannelMessage()
-            if message is None:
-                message = Message(peer_id=PeerChannel(channel_id=0))  # Default peer_id must be provided
-            self.original_update = original_update
-            self.pattern_match = pattern_match
-            self.message = message
-
-    # Example usage:
-    entities = [MessageEntityBold(offset=0, length=5), MessageEntityBold(offset=43, length=23)]
-    msg = Message(
-        peer_id=PeerChannel(channel_id=1994209728),  # Mandatory field
-        message='👨\u200d💻 SELL XAUUSD 2084\n🔸SL 2092\n🔹TP 2060\nAll Copyright© Reserved.',
-        entities=entities
-    )
-    update_new_channel_message = UpdateNewChannelMessage(message=msg)
-    new_message_event = NewMessageEvent(original_update=update_new_channel_message, message=msg)
-
-    ASTRATEQ_msg_processor(new_message_event)
-    # TFXC_msg_processor(event)
-    
-        
-        

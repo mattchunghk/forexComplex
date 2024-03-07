@@ -69,7 +69,7 @@ def PIPXPERT_msg_processor(event, lot=0.5):
             "stop_loss" : stop_loss,
             "magic":2,
             "comment":comment,
-            "close": False,
+            "action": "order",
             "reply_to_msg_id" : None
         }
         

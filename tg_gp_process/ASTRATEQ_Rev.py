@@ -6,7 +6,7 @@ import datetime
 def ASTRATEQ_msg_processor_rev(event, lot=0.5):
     print('event: ', event)
     message = event.message
-    comment = "ASTRATEQ"
+    comment = "ASTRATEQ-Rev"
     print('message: ', message)
     channel_id = message.peer_id.channel_id
     ms_id = str(channel_id) + str(message.id)
@@ -60,7 +60,7 @@ def ASTRATEQ_msg_processor_rev(event, lot=0.5):
             "stop_loss" : tp1, #!Edit
             "magic":5,
             "comment":comment,
-            "close": False,
+            "action": "order",
             "reply_to_msg_id" : None
         }
         

@@ -2,9 +2,9 @@
 import re
 
 
-def TFXC_msg_processor(event, lot=0.5):
+def TFXC_msg_processor_rev(event, lot=0.5):
     message = event.message
-    comment = "TFXC"
+    comment = "TFXC-Rev"
     print('message: ', message)
     channel_id = message.peer_id.channel_id
     ms_id = str(channel_id) + str(message.id)
@@ -25,7 +25,7 @@ def TFXC_msg_processor(event, lot=0.5):
 
 
         order_type = message.text.split()[2].strip()
-        mt5_order_type = 0 if "BUY" in order_type  else 1
+        mt5_order_type = 1 if "BUY" in order_type  else 0 #!Edited
         symbol = message.text.split()[3].strip()
         lot_size = 100000
         trade_volume = lot * lot_size
@@ -58,28 +58,15 @@ def TFXC_msg_processor(event, lot=0.5):
             "lot" : lot,
             "lot_size" : lot_size,
             "order_price" : order_price,
-            "tp1" : tp1,
+            "tp1" : stop_loss,#!Edited
             "tp2" : tp2,
             "tp3" : tp3,
-            "stop_loss" : stop_loss,
-            "magic":1,
+            "stop_loss" : tp1,#!Edited
+            "magic":6,
             "comment":comment,
             "action": "order",
             "reply_to_msg_id" : None
         }
         
         return result
-    elif  message.text and ("CLOSE" in (message.text).upper() or "HIT," in (message.text).upper() or "HIT" in (message.text).upper()): 
-    # elif  message.text and "close" in message.text: 
-        print('message.text: ', message.text.upper())
-        print('event: ', event)
-        # Close position
-        if event.message.reply_to_msg_id:
-            result={
-                'magic':1,
-                "action": "close",
-                "comment": comment,
-                "reply_to_msg_id" : event.message.reply_to_msg_id
-            } 
-            return result
-            
+    

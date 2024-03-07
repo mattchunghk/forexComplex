@@ -31,10 +31,10 @@ cur = conn.cursor()
 path = "C:\Program Files\Vantage International MT5/terminal64.exe"
 # path = "/Users/mattchung/.wine/drive_c/Program Files/Pepperstone MetaTrader 5/terminal64.exe"
 server = 'VantageInternational-Demo'
-mt5_username = os.getenv('mt5_vantage_demo_2_username')
-password = os.getenv('mt5_vantage_demo_2_password')
-# mt5_username = os.getenv('mt5_vantage_demo_username')
-# password = os.getenv('mt5_vantage_demo_password')
+# mt5_username = os.getenv('mt5_vantage_demo_2_username')
+# password = os.getenv('mt5_vantage_demo_2_password')
+mt5_username = os.getenv('mt5_vantage_demo_username')
+password = os.getenv('mt5_vantage_demo_password')
 
 deviation = 10
 # def start_mt5(username, password, server, path):
@@ -131,7 +131,7 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
         if event.message.reply_to_msg_id == None and channel_id != 2095861920:
             processed_msgs = tg_group_selector(event)
             for processed_msg in processed_msgs:
-                if processed_msg and processed_msg['close']==False:
+                if processed_msg and processed_msg['action']=="order":
                 
                     ms_id = processed_msg["ms_id"]
                     order_type = processed_msg["order_type"]
@@ -188,20 +188,18 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
                         print("   last_error={}".format(mt5.last_error()))
                     else:
                         print("Order executed successfully, ticket =", result.order)
-                        await client.send_message(-1002095861920, f"""{order_type}Order executed , ticket = {result.order}\n
-                                                                        Group: {comment}\n
-                                                                        symbol: {symbol}\n
-                                                                        price: {price}
+                        insert_msg_trade(conn, cur, ms_id, order_type, symbol, order_price, tp1, tp2, tp3, stop_loss, result.order)
+                        await client.send_message(-1001994209728, f"""{order_type} Order executed , ticket = {result.order}\nGroup: {comment}\nsymbol: {symbol}\nprice: {result.price}
                                                                     """ )
                         # Build the INSERT statement
-                        insert_msg_trade(conn, cur, ms_id, order_type, symbol, order_price, tp1, tp2, tp3, stop_loss, result.order)
+                        
 
                     # Shut down connection to MetaTrader 5
                     mt5.shutdown()
         elif event.message.reply_to_msg_id  and channel_id != 2095861920:
             processed_msgs = tg_group_selector(event)
             for processed_msg in processed_msgs:
-                if processed_msg and processed_msg['close']:
+                if processed_msg and processed_msg['action'] == "close":
                     start_mt5()
                     connect()
                     reply_to_msg_id = processed_msg["reply_to_msg_id"]
@@ -247,15 +245,43 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
                                 print("Failed to close position with ticket #", ticket, "error code =", result.retcode)
                             else:
                                 print("Position with ticket #", ticket, "closed successfully")
-                                await client.send_message(-1002095861920, f""" Closed executed , ticket = {result.order}\n
-                                                                    Group: {comment}\n
-                                                                    symbol: {symbol}\n
-                                                                    price: {price}
+                                await client.send_message(-1001994209728, f""" Closed executed , ticket = {result.order}\nGroup: {comment}\nsymbol: {symbol}\nprice: {price}
                                                                 """ )
 
                         # Shutdown the MT5 connection
                         mt5.shutdown()
+                elif processed_msg and processed_msg['action'] == "be":
+                    start_mt5()
+                    connect()
+                    reply_to_msg_id = processed_msg["reply_to_msg_id"]
+                    ms_id = str(channel_id) + str(reply_to_msg_id)
+                    magic = processed_msg["magic"]
+                    comment=processed_msg["comment"]
+                    result = get_order_id_by_msg_id(conn, cur, ms_id)  # Fetch the result from the query
                     
+
+                    if result is not None:
+                        ticket = int(result)
+                        position = mt5.positions_get(ticket=ticket)
+                        print('position: ', position)
+                        if position is None or len(position) == 0:
+                            print("No position with ticket #", ticket)
+                        else:
+                            position = position[0]
+                            symbol = position.symbol
+                            lot = position.volume
+                            order_result = modify_trade(position.ticket, symbol, position.price_open, position.tp)
+                            print('order_result: ', order_result)
+
+
+                            if order_result.retcode != mt5.TRADE_RETCODE_DONE:
+                                print("Failed to BE position with ticket #", ticket, "error code =", order_result.retcode)
+                            else:
+                                print("Position with ticket #", ticket, "BE successfully")
+                                await client.send_message(-1001994209728, f""" BE executed , ticket = {order_result.order}\nGroup: {comment}\nsymbol: {symbol}""" )
+
+                        # Shutdown the MT5 connection
+                        mt5.shutdown()
                     
             
     @client.on(events.MessageEdited(chats=channel_id_list))
@@ -286,9 +312,8 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
                             
                             update_trade_message(conn, cur,tp1, tp2, tp3, stop_loss, ms_id)
                             order_result = modify_trade(order_id, symbol, stop_loss, tp1)
-                            await client.send_message(-1002095861920, f""" Order modify , ticket = {order_result.order}\n
-                                                                    Group: {comment}\n
-                                                                    symbol: {symbol}
+                            print('order_result: ', order_result)
+                            await client.send_message(-1001994209728, f""" Order modify , ticket = {order_id}\nGroup: {comment}\nsymbol: {symbol}
                                                                 """ )
                             
                         else:
