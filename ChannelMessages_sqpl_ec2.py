@@ -99,6 +99,7 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
     # Replace 'YOUR_CHANNEL_USERNAME' with the username of the channel you want to monitor
     channel_username = "https://t.me/TFXC_FREE"
     channel_username = "1994209728"
+    print("Listen ON")
     # channel_username = "https://t.me/test_it_tg"
     
     #*channel_id_list = [TFXC PREMIUM, TFXC SIGNALS, TFXC CHAT, Test Private]
@@ -116,6 +117,7 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
     # @client.on(events.NewMessage(PeerChannel(channel_id=channel_id_list[channel_index])))
     @client.on(events.NewMessage(chats=channel_id_list))
     async def handle_new_message(event):
+        
 
         
         channel_id = event.message.peer_id.channel_id
@@ -127,119 +129,132 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
         # print('event: ', event)
 
         if event.message.reply_to_msg_id == None and channel_id != 2095861920:
-            processed_msg = tg_group_selector(event)
-            if processed_msg and processed_msg['close']==False:
-            
-                ms_id = processed_msg["ms_id"]
-                order_type = processed_msg["order_type"]
-                mt5_order_type = processed_msg["mt5_order_type"]
-                symbol= processed_msg["symbol"]
-                lot = processed_msg["lot"]
-                lot_size = processed_msg["lot_size"]
-                order_price = processed_msg["order_price"]
-                tp1 = processed_msg["tp1"]
-                tp2 = processed_msg["tp2"]
-                tp3 = processed_msg["tp3"]
-                stop_loss = processed_msg["stop_loss"]
-                magic = processed_msg["magic"]
-                comment=processed_msg["comment"]
-                reply_to_msg_id = processed_msg["reply_to_msg_id"]
+            processed_msgs = tg_group_selector(event)
+            for processed_msg in processed_msgs:
+                if processed_msg and processed_msg['close']==False:
                 
-                start_mt5()
-                connect()
-                
-                if not mt5.symbol_select(symbol, True):
-                    print(f"{symbol} is not available, can not trade.")
-                    mt5.shutdown()
-                    # quit()
-                account_info=mt5.account_info()
-                # # 检查账户可用保证金
-                # if account_info.balance < trade_volume * account_info.leverage:
-                #     print('账户可用保证金不足')
-                #     mt5.shutdown()
-                order = {
-                    "action": mt5.TRADE_ACTION_DEAL,
-                    "symbol": symbol,
-                    "volume": lot,
-                    "type": mt5_order_type,
-                    "price": order_price,
-                    "sl": stop_loss,
-                    "tp": tp1,
-                    "deviation": 10,
-                    "magic": magic,
-                    "comment": comment,
-                    "type_time": mt5.ORDER_TIME_GTC,
-                    "type_filling": mt5.ORDER_FILLING_IOC,
-                }
+                    ms_id = processed_msg["ms_id"]
+                    order_type = processed_msg["order_type"]
+                    mt5_order_type = processed_msg["mt5_order_type"]
+                    symbol= processed_msg["symbol"]
+                    lot = processed_msg["lot"]
+                    lot_size = processed_msg["lot_size"]
+                    order_price = processed_msg["order_price"]
+                    tp1 = processed_msg["tp1"]
+                    tp2 = processed_msg["tp2"]
+                    tp3 = processed_msg["tp3"]
+                    stop_loss = processed_msg["stop_loss"]
+                    magic = processed_msg["magic"]
+                    comment=processed_msg["comment"]
+                    reply_to_msg_id = processed_msg["reply_to_msg_id"]
+                    
+                    start_mt5()
+                    connect()
+                    
+                    if not mt5.symbol_select(symbol, True):
+                        print(f"{symbol} is not available, can not trade.")
+                        mt5.shutdown()
+                        # quit()
+                    account_info=mt5.account_info()
+                    # # 检查账户可用保证金
+                    # if account_info.balance < trade_volume * account_info.leverage:
+                    #     print('账户可用保证金不足')
+                    #     mt5.shutdown()
+                    order = {
+                        "action": mt5.TRADE_ACTION_DEAL,
+                        "symbol": symbol,
+                        "volume": lot,
+                        "type": mt5_order_type,
+                        "price": order_price,
+                        "sl": stop_loss,
+                        "tp": tp1,
+                        "deviation": 10,
+                        "magic": magic,
+                        "comment": comment,
+                        "type_time": mt5.ORDER_TIME_GTC,
+                        "type_filling": mt5.ORDER_FILLING_IOC,
+                    }
 
-                result = mt5.order_send(order)
-                print('result: ', result)
-                
-                # Check the execution result
-                if result.retcode != mt5.TRADE_RETCODE_DONE:
-                    print("order_send failed, retcode =", result.retcode)
-                    # Request the result as a dictionary and display it
-                    result_dict = result._asdict()
-                    for field in result_dict.keys():
-                        print("   {}={}".format(field, result_dict[field]))
-                    print("   last_error={}".format(mt5.last_error()))
-                else:
-                    print("Order executed successfully, ticket =", result.order)
-                    # Build the INSERT statement
-                    insert_msg_trade(conn, cur, ms_id, order_type, symbol, order_price, tp1, tp2, tp3, stop_loss, result.order)
-
-                # Shut down connection to MetaTrader 5
-                mt5.shutdown()
-        elif event.message.reply_to_msg_id  and channel_id != 2095861920:
-            processed_msg = tg_group_selector(event)
-            if processed_msg and processed_msg['close']:
-                start_mt5()
-                connect()
-                reply_to_msg_id = processed_msg["reply_to_msg_id"]
-                ms_id = str(channel_id) + str(reply_to_msg_id)
-                magic = processed_msg["magic"]
-                comment=processed_msg["comment"]
-                result = get_order_id_by_msg_id(conn, cur, ms_id)  # Fetch the result from the query
-                
-                
-                print('result: ', result)
-
-                if result is not None:
-                    ticket = int(result)
-                    position = mt5.positions_get(ticket=ticket)
-                    print('position: ', position)
-                    if position is None or len(position) == 0:
-                        print("No position with ticket #", ticket)
+                    result = mt5.order_send(order)
+                    print('result: ', result)
+                    
+                    # Check the execution result
+                    if result.retcode != mt5.TRADE_RETCODE_DONE:
+                        print("order_send failed, retcode =", result.retcode)
+                        # Request the result as a dictionary and display it
+                        result_dict = result._asdict()
+                        for field in result_dict.keys():
+                            print("   {}={}".format(field, result_dict[field]))
+                        print("   last_error={}".format(mt5.last_error()))
                     else:
-                        position = position[0]
-                        symbol = position.symbol
-                        lot = position.volume
-                        position_type = position.type
-                        price = mt5.symbol_info_tick(symbol).ask if position_type == mt5.ORDER_TYPE_BUY else mt5.symbol_info_tick(symbol).bid
+                        print("Order executed successfully, ticket =", result.order)
+                        await client.send_message(-1002095861920, f"""{order_type}Order executed , ticket = {result.order}\n
+                                                                        Group: {comment}\n
+                                                                        symbol: {symbol}\n
+                                                                        price: {price}
+                                                                    """ )
+                        # Build the INSERT statement
+                        insert_msg_trade(conn, cur, ms_id, order_type, symbol, order_price, tp1, tp2, tp3, stop_loss, result.order)
 
-                        # Prepare request for closing position
-                        close_request = {
-                            "action": mt5.TRADE_ACTION_DEAL,
-                            "symbol": symbol,
-                            "volume": lot,
-                            "type": mt5.ORDER_TYPE_SELL if position_type == mt5.ORDER_TYPE_BUY else mt5.ORDER_TYPE_BUY,
-                            "position": int(ticket),
-                            "price": price,
-                            "magic": magic,
-                            "comment": comment,
-                            "type_time": mt5.ORDER_TIME_GTC,
-                            "type_filling": mt5.ORDER_FILLING_IOC,
-                        }
-
-                        # Send close request
-                        result = mt5.order_send(close_request)
-                        if result.retcode != mt5.TRADE_RETCODE_DONE:
-                            print("Failed to close position with ticket #", ticket, "error code =", result.retcode)
-                        else:
-                            print("Position with ticket #", ticket, "closed successfully")
-
-                    # Shutdown the MT5 connection
+                    # Shut down connection to MetaTrader 5
                     mt5.shutdown()
+        elif event.message.reply_to_msg_id  and channel_id != 2095861920:
+            processed_msgs = tg_group_selector(event)
+            for processed_msg in processed_msgs:
+                if processed_msg and processed_msg['close']:
+                    start_mt5()
+                    connect()
+                    reply_to_msg_id = processed_msg["reply_to_msg_id"]
+                    ms_id = str(channel_id) + str(reply_to_msg_id)
+                    magic = processed_msg["magic"]
+                    comment=processed_msg["comment"]
+                    result = get_order_id_by_msg_id(conn, cur, ms_id)  # Fetch the result from the query
+                    
+                    
+                    print('result: ', result)
+
+                    if result is not None:
+                        ticket = int(result)
+                        position = mt5.positions_get(ticket=ticket)
+                        print('position: ', position)
+                        if position is None or len(position) == 0:
+                            print("No position with ticket #", ticket)
+                        else:
+                            position = position[0]
+                            symbol = position.symbol
+                            lot = position.volume
+                            position_type = position.type
+                            price = mt5.symbol_info_tick(symbol).ask if position_type == mt5.ORDER_TYPE_BUY else mt5.symbol_info_tick(symbol).bid
+
+                            # Prepare request for closing position
+                            close_request = {
+                                "action": mt5.TRADE_ACTION_DEAL,
+                                "symbol": symbol,
+                                "volume": lot,
+                                "type": mt5.ORDER_TYPE_SELL if position_type == mt5.ORDER_TYPE_BUY else mt5.ORDER_TYPE_BUY,
+                                "position": int(ticket),
+                                "price": price,
+                                "magic": magic,
+                                "comment": comment,
+                                "type_time": mt5.ORDER_TIME_GTC,
+                                "type_filling": mt5.ORDER_FILLING_IOC,
+                            }
+
+                            # Send close request
+                            result = mt5.order_send(close_request)
+                            print('close request result: ', result)
+                            if result.retcode != mt5.TRADE_RETCODE_DONE:
+                                print("Failed to close position with ticket #", ticket, "error code =", result.retcode)
+                            else:
+                                print("Position with ticket #", ticket, "closed successfully")
+                                await client.send_message(-1002095861920, f""" Closed executed , ticket = {result.order}\n
+                                                                    Group: {comment}\n
+                                                                    symbol: {symbol}\n
+                                                                    price: {price}
+                                                                """ )
+
+                        # Shutdown the MT5 connection
+                        mt5.shutdown()
                     
                     
             
@@ -247,36 +262,42 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
     async def handle_edited_message(event):
         channel_id = event.message.peer_id.channel_id
         if event.message.reply_to_msg_id == None and channel_id != 2095861920:
-            processed_msg = tg_group_selector(event)
-            if processed_msg :
-            
-                ms_id = processed_msg["ms_id"]
-                symbol= processed_msg["symbol"]
-                tp1 = processed_msg["tp1"]
-                tp2 = processed_msg["tp2"]
-                tp3 = processed_msg["tp3"]
-                stop_loss = processed_msg["stop_loss"]
-                    
-                start_mt5()
-                connect()    
-                try:
-
-                    result = get_order_id_by_msg_id(conn, cur, ms_id)  # Fetch the result from the query
-                    print('result: ', result)
-
-                    if result is not None:
-                        order_id = result  # Extract the order_id from the result
+            processed_msgs = tg_group_selector(event)
+            for processed_msg in processed_msgs:
+                if processed_msg :
+                
+                    ms_id = processed_msg["ms_id"]
+                    symbol= processed_msg["symbol"]
+                    tp1 = processed_msg["tp1"]
+                    tp2 = processed_msg["tp2"]
+                    tp3 = processed_msg["tp3"]
+                    stop_loss = processed_msg["stop_loss"]
+                    comment=processed_msg["comment"]
                         
-                        update_trade_message(conn, cur,tp1, tp2, tp3, stop_loss, ms_id)
-                        modify_trade(order_id, symbol, stop_loss, tp1)
-                        
-                    else:
-                        print("No order_id found for the given ms_id.")
-                except Exception as e:
-                    conn.rollback()
-                    print("Error occurred:", e)
+                    start_mt5()
+                    connect()    
+                    try:
 
-                mt5.shutdown()
+                        result = get_order_id_by_msg_id(conn, cur, ms_id)  # Fetch the result from the query
+                        print('result: ', result)
+
+                        if result is not None:
+                            order_id = result  # Extract the order_id from the result
+                            
+                            update_trade_message(conn, cur,tp1, tp2, tp3, stop_loss, ms_id)
+                            order_result = modify_trade(order_id, symbol, stop_loss, tp1)
+                            await client.send_message(-1002095861920, f""" Order modify , ticket = {order_result.order}\n
+                                                                    Group: {comment}\n
+                                                                    symbol: {symbol}
+                                                                """ )
+                            
+                        else:
+                            print("No order_id found for the given ms_id.")
+                    except Exception as e:
+                        conn.rollback()
+                        print("Error occurred:", e)
+
+                    mt5.shutdown()
     # Start the client
     client.run_until_disconnected()
     

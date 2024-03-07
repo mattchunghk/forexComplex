@@ -58,7 +58,8 @@ magic_to_name_mapping = {
     1: 'TFXC',
     2: 'PIPXPERT',
     3: 'FXGoldenCircle',
-    4: 'ASTRATEQ'
+    4: 'ASTRATEQ',
+    5: 'ASTRATEQ(Rev)'
     # Add more mappings here if needed
 }
 def magic_number_to_name(magic_number):
@@ -133,7 +134,7 @@ def get_result(message):
        # Prepare the results in a message format
         message = "Profits by TG Group:\n"
         for group_name, profit in sorted_profits_period.items():
-            message += f"{group_name}: {profit}\n"
+           message += f"{group_name}: ${profit:.2f}\n"
 
         # message += "\nOverall profits by magic number:\n"
         # for magic_number, profit in sorted_overall_profits.items():

@@ -78,6 +78,7 @@ def TFXC_msg_processor(event, lot=0.5):
             result={
                 'magic':1,
                 "close": True,
+                "comment": comment,
                 "reply_to_msg_id" : event.message.reply_to_msg_id
             } 
             return result
