@@ -278,7 +278,7 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
                                 print("Failed to BE position with ticket #", ticket, "error code =", order_result.retcode)
                             else:
                                 print("Position with ticket #", ticket, "BE successfully")
-                                await client.send_message(-1001994209728, f""" BE executed , ticket = {order_result.order}\nGroup: {comment}\nsymbol: {symbol}""" )
+                                await client.send_message(-1001994209728, f""" BE executed , ticket = {position.ticket}\nGroup: {comment}\nsymbol: {symbol}""" )
 
                         # Shutdown the MT5 connection
                         mt5.shutdown()

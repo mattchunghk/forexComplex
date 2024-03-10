@@ -66,8 +66,7 @@ def ASTRATEQ_msg_processor(event, lot=0.5):
         return result
     elif  message.text and ("CLOSE" in (message.text).upper()): 
     # elif  message.text and "close" in message.text: 
-        print('message.text: ', message.text.upper())
-        print('event: ', event)
+
         # Close position
         if event.message.reply_to_msg_id:
             result={
