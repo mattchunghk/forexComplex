@@ -19,7 +19,8 @@ def tg_group_selector(event):
     
     #ASTRATEQ
     if  channel_id == 1967274081 :
-        return [ASTRATEQ_msg_processor(event,lot), ASTRATEQ_msg_processor_rev(event,lot)]
+        # return [ASTRATEQ_msg_processor(event,lot), ASTRATEQ_msg_processor_rev(event,lot)]
+        return [ASTRATEQ_msg_processor(event,lot)]
         
     
     #ASTRATEQ

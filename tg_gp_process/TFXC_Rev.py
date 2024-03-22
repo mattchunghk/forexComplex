@@ -5,7 +5,7 @@ import re
 def TFXC_msg_processor_rev(event, lot=0.5):
     message = event.message
     comment = "TFXC-Rev"
-    print('message: ', message)
+    # print('message: ', message)
     channel_id = message.peer_id.channel_id
     ms_id = str(channel_id) + str(message.id)
 # Process the new message

@@ -4,10 +4,10 @@ import datetime
 
 
 def ASTRATEQ_msg_processor(event, lot=0.5):
-    print('event: ', event)
+    # print('event: ', event)
     message = event.message
     comment = "ASTRATEQ"
-    print('message: ', message)
+    # print('message: ', message)
     channel_id = message.peer_id.channel_id
     ms_id = str(channel_id) + str(message.id)
     # Process the new message
@@ -84,7 +84,8 @@ def ASTRATEQ_msg_processor(event, lot=0.5):
         if event.message.reply_to_msg_id:
             result={
                 'magic':4,
-                "action": "be",
+                # "action": "be",
+                "action": "close",
                 "comment": comment,
                 "reply_to_msg_id" : event.message.reply_to_msg_id
             } 

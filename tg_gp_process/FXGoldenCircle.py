@@ -5,7 +5,7 @@ import re
 def FXGoldenCircle_msg_processor(event, lot=0.5):
     message = event.message
     comment = "FXGoldenCircle"
-    print('message: ', message)
+    # print('message: ', message)
     channel_id = message.peer_id.channel_id
     ms_id = str(channel_id) + str(message.id)
     # Process the new message
