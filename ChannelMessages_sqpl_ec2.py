@@ -38,7 +38,7 @@ password = os.getenv('mt5_vantage_demo_password')
 
 deviation = 10
 # def start_mt5(username, password, server, path):
-def start_mt5():
+def start_mt5(mt5_username,password,server,path):
     # Ensure that all variables are the correct type
     uname = int(mt5_username)  # Username must be an int
     pword = str(password)  # Password must be a string
@@ -104,7 +104,7 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
     
     #*channel_id_list = [TFXC PREMIUM, TFXC SIGNALS, TFXC CHAT, Test Private]
     # channel_id_list = [1220837618,1541002369,1675658808,1994209728]
-    channel_id_list = [1994209728,2095861920,1220837618,1967274081,1327949777,1821216397]
+    channel_id_list = [1994209728,2095861920,1220837618,1967274081,1327949777,1821216397,1758700941,1850974680]
 
     # Get information about the channel
     # channel = client.get_entity(channel_username)
@@ -148,7 +148,16 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
                     comment=processed_msg["comment"]
                     reply_to_msg_id = processed_msg["reply_to_msg_id"]
                     
-                    start_mt5()
+                    if processed_msg['acc']=="live":
+                        server = 'VantageInternational-Live'
+                        mt5_username = os.getenv('mt5_vantage_live_username')
+                        password = os.getenv('mt5_vantage_live_password')
+                    else:
+                        server = 'VantageInternational-Demo'
+                        mt5_username = os.getenv('mt5_vantage_demo_username')
+                        password = os.getenv('mt5_vantage_demo_password')
+                    
+                    start_mt5(mt5_username,password,server,path)
                     connect()
                     
                     if not mt5.symbol_select(symbol, True):
@@ -200,7 +209,15 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
             processed_msgs = tg_group_selector(event)
             for processed_msg in processed_msgs:
                 if processed_msg and processed_msg['action'] == "close":
-                    start_mt5()
+                    if processed_msg['acc']=="live":
+                        server = 'VantageInternational-Live'
+                        mt5_username = os.getenv('mt5_vantage_live_username')
+                        password = os.getenv('mt5_vantage_live_password')
+                    else:
+                        server = 'VantageInternational-Demo'
+                        mt5_username = os.getenv('mt5_vantage_demo_username')
+                        password = os.getenv('mt5_vantage_demo_password')
+                    start_mt5(mt5_username,password,server,path)
                     connect()
                     reply_to_msg_id = processed_msg["reply_to_msg_id"]
                     ms_id = str(channel_id) + str(reply_to_msg_id)
@@ -251,7 +268,15 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
                         # Shutdown the MT5 connection
                         mt5.shutdown()
                 elif processed_msg and processed_msg['action'] == "be":
-                    start_mt5()
+                    if processed_msg['acc']=="live":
+                        server = 'VantageInternational-Live'
+                        mt5_username = os.getenv('mt5_vantage_live_username')
+                        password = os.getenv('mt5_vantage_live_password')
+                    else:
+                        server = 'VantageInternational-Demo'
+                        mt5_username = os.getenv('mt5_vantage_demo_username')
+                        password = os.getenv('mt5_vantage_demo_password')
+                    start_mt5(mt5_username,password,server,path)
                     connect()
                     reply_to_msg_id = processed_msg["reply_to_msg_id"]
                     ms_id = str(channel_id) + str(reply_to_msg_id)
@@ -299,8 +324,17 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
                     tp3 = processed_msg["tp3"]
                     stop_loss = processed_msg["stop_loss"]
                     comment=processed_msg["comment"]
+                    
+                    if processed_msg['acc']=="live":
+                        server = 'VantageInternational-Live'
+                        mt5_username = os.getenv('mt5_vantage_live_username')
+                        password = os.getenv('mt5_vantage_live_password')
+                    else:
+                        server = 'VantageInternational-Demo'
+                        mt5_username = os.getenv('mt5_vantage_demo_username')
+                        password = os.getenv('mt5_vantage_demo_password')
                         
-                    start_mt5()
+                    start_mt5(mt5_username,password,server,path)
                     connect()    
                     try:
 

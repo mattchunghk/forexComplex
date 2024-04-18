@@ -55,12 +55,18 @@ start_mt5()
 
 # Define the mapping of magic numbers to names
 magic_to_name_mapping = {
+    243000:"Supertrend",
     1: 'TFXC',
     2: 'PIPXPERT',
     3: 'FXGoldenCircle',
     4: 'ASTRATEQ',
     5: 'ASTRATEQ(Rev)',
-    6: 'TFXC(Rev)'
+    6: 'TFXC(Rev)',
+    7: 'ChatGPT',
+    8: 'Gemini',
+    9: 'Gemini-supertrend',
+    10: 'Forexero',
+    11: 'Gold Ninja',
     # Add more mappings here if needed
 }
 def magic_number_to_name(magic_number):
@@ -88,8 +94,9 @@ def sum_profits_and_count_wins_by_name(trades):
         magic_number = trade.magic  # Assuming 'magic' is an attribute of 'trade'
         name = magic_number_to_name(magic_number)  # Get the name corresponding to the magic number
         profit = trade.profit
+
         win = int(profit > 0)  # 1 if win, 0 if loss or break-even
-        loss = int(profit <= 0)  # 1 if loss or break-even, 0 if win
+        loss = int(profit < 0)  # 1 if loss or break-even, 0 if win
 
         if name in results:
             results[name]['profit'] += profit

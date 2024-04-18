@@ -2,14 +2,14 @@
 import re
 
 
-def TFXC_msg_processor(event, lot=0.5):
+def GOLD_NINJA_msg_processor(event, lot=0.5):
     message = event.message
-    comment = "TFXC"
+    comment = "Gold_ninja"
     # print('message: ', message)
     channel_id = message.peer_id.channel_id
     ms_id = str(channel_id) + str(message.id)
-# Process the new message
-    if message.text and "SIGNAL ALERT" in message.text:
+    # Process the new message
+    if message.text and "TP1" in message.text and "SL" in message.text and "TP2" in message.text and "TP3" in message.text:
         print(message)
         channel_id = message.peer_id.channel_id
         org_message = message.text
@@ -24,23 +24,28 @@ def TFXC_msg_processor(event, lot=0.5):
         print('converted_data: ', converted_data)
 
 
-        order_type = message.text.split()[2].strip()
+        order_type = message.text.split()[1].strip()
         mt5_order_type = 0 if "BUY" in order_type  else 1
-        symbol = message.text.split()[3].strip()
+        
+        symbol = message.text.split()[0].strip()
+        if  "GOLD" in symbol:
+            symbol = "XAUUSD"
+        elif "/"in symbol:
+            symbol = message.text.split()[0].replace("🔔", "").strip().replace("/", "").replace("*", "")
         lot_size = 100000
         trade_volume = lot * lot_size
         if "TP1" in org_message and "TP2" in org_message and "TP3" in org_message :
             order_price = converted_data[0]
-            tp1 = converted_data[1]
-            tp2 = converted_data[2]
-            tp3 = converted_data[3]
-            stop_loss = converted_data[4]
+            tp1 = converted_data[3]
+            tp2 = converted_data[4]
+            tp3 = converted_data[5]
+            stop_loss = converted_data[2]
         else:
             order_price = converted_data[0]
-            tp1 = converted_data[1]
+            tp1 = converted_data[3]
             tp2 = 0
             tp3 = 0
-            stop_loss = converted_data[2]
+            stop_loss = converted_data[1]
             
         print('symbol: ', symbol)
         print('order_type: ', order_type)
@@ -57,12 +62,12 @@ def TFXC_msg_processor(event, lot=0.5):
             "symbol": symbol,
             "lot" : lot,
             "lot_size" : lot_size,
-            "order_price" : order_price,
-            "tp1" : tp1,
-            "tp2" : tp2,
-            "tp3" : tp3,
-            "stop_loss" : stop_loss,
-            "magic":1,
+            "order_price" : float(order_price),
+            "tp1" : float(tp1),
+            "tp2" : float(tp2),
+            "tp3" : float(tp3),
+            "stop_loss" : float(stop_loss),
+            "magic":11,
             "comment":comment,
             "action": "order",
             "reply_to_msg_id" : None,
@@ -70,18 +75,5 @@ def TFXC_msg_processor(event, lot=0.5):
         }
         
         return result
-    elif  message.text and ("CLOSE" in (message.text).upper() or "HIT," in (message.text).upper() or "HIT" in (message.text).upper()): 
-    # elif  message.text and "close" in message.text: 
-        print('message.text: ', message.text.upper())
-        print('event: ', event)
-        # Close position
-        if event.message.reply_to_msg_id:
-            result={
-                'magic':1,
-                "action": "close",
-                "comment": comment,
-                "reply_to_msg_id" : event.message.reply_to_msg_id,
-                "acc":"demo"
-            } 
-            return result
-            
+        
+        

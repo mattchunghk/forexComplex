@@ -65,7 +65,8 @@ def TFXC_msg_processor_rev(event, lot=0.5):
             "magic":6,
             "comment":comment,
             "action": "order",
-            "reply_to_msg_id" : None
+            "reply_to_msg_id" : None,
+            "acc":"demo"
         }
         
         return result

@@ -60,7 +60,8 @@ def ASTRATEQ_msg_processor(event, lot=0.5):
             "magic":4,
             "comment":comment,
             "action": "order",
-            "reply_to_msg_id" : None
+            "reply_to_msg_id" : None,
+            "acc":"demo"
         }
         
         return result
@@ -73,7 +74,8 @@ def ASTRATEQ_msg_processor(event, lot=0.5):
                 'magic':4,
                 "action": "close",
                 "comment": comment,
-                "reply_to_msg_id" : event.message.reply_to_msg_id
+                "reply_to_msg_id" : event.message.reply_to_msg_id,
+                "acc":"demo"
             } 
             return result
     elif  message.text and ("BREAKEVEN" in (message.text).upper()): 
@@ -87,7 +89,8 @@ def ASTRATEQ_msg_processor(event, lot=0.5):
                 # "action": "be",
                 "action": "close",
                 "comment": comment,
-                "reply_to_msg_id" : event.message.reply_to_msg_id
+                "reply_to_msg_id" : event.message.reply_to_msg_id,
+                "acc":"demo"
             } 
             return result
     
