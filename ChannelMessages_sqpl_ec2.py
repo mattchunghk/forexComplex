@@ -205,6 +205,125 @@ with TelegramClient("forex_modify", api_id, api_hash) as client:
 
                     # Shut down connection to MetaTrader 5
                     mt5.shutdown()
+                    
+                if processed_msg and processed_msg['action']=="just":
+                    
+                    ms_id = processed_msg["ms_id"]
+                    order_type = processed_msg["order_type"]
+                    mt5_order_type = processed_msg["mt5_order_type"]
+                    symbol= processed_msg["symbol"]
+                    lot = processed_msg["lot"]
+                    lot_size = processed_msg["lot_size"]
+                    order_price = processed_msg["order_price"]
+                    tp1 = processed_msg["tp1"]
+                    tp2 = processed_msg["tp2"]
+                    tp3 = processed_msg["tp3"]
+                    stop_loss = processed_msg["stop_loss"]
+                    magic = processed_msg["magic"]
+                    comment=processed_msg["comment"]
+                    reply_to_msg_id = processed_msg["reply_to_msg_id"]
+                    
+                    if processed_msg['acc']=="live":
+                        server = 'VantageInternational-Live'
+                        mt5_username = os.getenv('mt5_vantage_live_username')
+                        password = os.getenv('mt5_vantage_live_password')
+                    else:
+                        server = 'VantageInternational-Demo'
+                        mt5_username = os.getenv('mt5_vantage_demo_username')
+                        password = os.getenv('mt5_vantage_demo_password')
+                    
+                    start_mt5(mt5_username,password,server,path)
+                    connect()
+                    
+                    order = {
+                        "action": mt5.TRADE_ACTION_DEAL,
+                        "symbol": symbol,
+                        "volume": lot,
+                        "type": mt5_order_type,
+                        "price": order_price,
+                        "sl": stop_loss,
+                        "tp": tp1,
+                        "deviation": 10,
+                        "magic": magic,
+                        "comment": comment,
+                        "type_time": mt5.ORDER_TIME_GTC,
+                        "type_filling": mt5.ORDER_FILLING_IOC,
+                    }
+                    
+                    result = mt5.order_send(order)
+                    print('result: ', result)
+                    
+                    # Check the execution result
+                    if result.retcode != mt5.TRADE_RETCODE_DONE:
+                        print("order_send failed, retcode =", result.retcode)
+                        # Request the result as a dictionary and display it
+                        result_dict = result._asdict()
+                        for field in result_dict.keys():
+                            print("   {}={}".format(field, result_dict[field]))
+                        print("   last_error={}".format(mt5.last_error()))
+                    else:
+                        print("Order executed successfully, ticket =", result.order)
+                        await client.send_message(-1001994209728, f"""{order_type} Order executed , ticket = {result.order}\nGroup: {comment}\nsymbol: {symbol}\nprice: {result.price}
+                                                                    """ )
+                        
+                    # Shut down connection to MetaTrader 5
+                    mt5.shutdown()
+                    
+                if processed_msg and processed_msg['action']=="mod":
+                    
+                    ms_id = processed_msg["ms_id"]
+                    order_type = processed_msg["order_type"]
+                    mt5_order_type = processed_msg["mt5_order_type"]
+                    symbol= processed_msg["symbol"]
+                    lot = processed_msg["lot"]
+                    lot_size = processed_msg["lot_size"]
+                    order_price = processed_msg["order_price"]
+                    tp1 = processed_msg["tp1"]
+                    tp2 = processed_msg["tp2"]
+                    tp3 = processed_msg["tp3"]
+                    stop_loss = processed_msg["stop_loss"]
+                    magic = processed_msg["magic"]
+                    comment=processed_msg["comment"]
+                    reply_to_msg_id = processed_msg["reply_to_msg_id"]
+                    
+                    if processed_msg['acc']=="live":
+                        server = 'VantageInternational-Live'
+                        mt5_username = os.getenv('mt5_vantage_live_username')
+                        password = os.getenv('mt5_vantage_live_password')
+                    else:
+                        server = 'VantageInternational-Demo'
+                        mt5_username = os.getenv('mt5_vantage_demo_username')
+                        password = os.getenv('mt5_vantage_demo_password')
+                    
+                    start_mt5(mt5_username,password,server,path)
+                    connect()
+                    
+                    positions = mt5.positions_get(symbol="XAUUSD")
+                    ticket = None
+                    for position in positions:
+                        if position.magic == 12 and position.sl == 0.0 and position.tp == 0.0:
+                            ticket = position.ticket
+                    
+                            result = modify_trade(ticket, "XAUUSD", stop_loss, tp2)
+                            print('result: ', result)
+                            
+                            # Check the execution result
+                            if result.retcode != mt5.TRADE_RETCODE_DONE:
+                                print("order_send failed, retcode =", result.retcode)
+                                # Request the result as a dictionary and display it
+                                result_dict = result._asdict()
+                                for field in result_dict.keys():
+                                    print("   {}={}".format(field, result_dict[field]))
+                                print("   last_error={}".format(mt5.last_error()))
+                            else:
+                                print("Order executed successfully, ticket =", result.order)
+                                insert_msg_trade(conn, cur, ms_id, order_type, symbol, order_price, tp1, tp2, tp3, stop_loss, result.order)
+                                await client.send_message(-1001994209728, f"""{order_type} Order modified , ticket = {result.order}\nGroup: {comment}\nsymbol: {symbol}
+                                                                            """ )
+                        
+                    # Shut down connection to MetaTrader 5
+                    mt5.shutdown()
+                        
         elif event.message.reply_to_msg_id  and channel_id != 2095861920:
             processed_msgs = tg_group_selector(event)
             for processed_msg in processed_msgs:

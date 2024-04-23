@@ -5,6 +5,7 @@ from tg_gp_process.ASTRATEQ_Rev import ASTRATEQ_msg_processor_rev
 from tg_gp_process.FOREXERO import FOREXERO_msg_processor
 from tg_gp_process.FXGoldenCircle import FXGoldenCircle_msg_processor
 from tg_gp_process.GOLD_NINJA import GOLD_NINJA_msg_processor
+from tg_gp_process.GOLD_NINJA_now import GOLD_NINJA_msg_processor_now
 from tg_gp_process.PIPXPERT import PIPXPERT_msg_processor
 from tg_gp_process.TFXC import TFXC_msg_processor
 from tg_gp_process.TFXC_Rev import TFXC_msg_processor_rev
@@ -39,4 +40,5 @@ def tg_group_selector(event):
     
     #Gold Ninja
     if  channel_id == 1850974680 or channel_id == 1994209728:
-        return [GOLD_NINJA_msg_processor(event,lot)]
+        # return [GOLD_NINJA_msg_processor(event,lot)]
+        return [GOLD_NINJA_msg_processor_now(event,lot)]

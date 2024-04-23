@@ -55,7 +55,7 @@ start_mt5()
 
 # Define the mapping of magic numbers to names
 magic_to_name_mapping = {
-    243000:"Supertrend",
+    243000:"test",
     1: 'TFXC',
     2: 'PIPXPERT',
     3: 'FXGoldenCircle',
@@ -67,6 +67,7 @@ magic_to_name_mapping = {
     9: 'Gemini-supertrend',
     10: 'Forexero',
     11: 'Gold Ninja',
+    12: 'Gold Ninja_now',
     # Add more mappings here if needed
 }
 def magic_number_to_name(magic_number):
