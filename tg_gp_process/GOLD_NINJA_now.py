@@ -86,6 +86,7 @@ def GOLD_NINJA_msg_processor_now(event, lot=0.5):
             converted_data = [float(num) for num in price_data]
         
         print('converted_data: ', converted_data)
+        
 
 
         order_type = message.text.split()[1].strip()
@@ -119,6 +120,24 @@ def GOLD_NINJA_msg_processor_now(event, lot=0.5):
         print('tp3: ', tp3)
         print('stop_loss: ', stop_loss)
         
+        sl_pips = 20000 
+        tp_pips = 20000
+        symbol_info = mt5.symbol_info(symbol)
+        
+        manual_sl = None
+        manual_tp = None
+        
+        if order_type.upper() == 'buy':
+            # trade_type = mt5.ORDER_TYPE_BUY
+            price = mt5.symbol_info_tick(symbol).ask
+            manual_sl = round(price - sl_pips * symbol_info.point, 2)  # Rounded Stop loss for a buy order
+            manual_tp = round(price + tp_pips * symbol_info.point, 2)  # Rounded Take profit for a buy order
+        elif order_type.upper() == 'sell':
+            # trade_type = mt5.ORDER_TYPE_SELL
+            price = mt5.symbol_info_tick(symbol).bid
+            manual_sl = round(price + sl_pips * symbol_info.point, 2)  # Rounded Stop loss for a sell order
+            manual_tp = round(price - tp_pips * symbol_info.point, 2)  # Rounded Take profit for a sell order
+        
         result={
             "ms_id" : ms_id,
             "order_type" : order_type,
@@ -130,7 +149,8 @@ def GOLD_NINJA_msg_processor_now(event, lot=0.5):
             "tp1" : float(tp1),
             "tp2" : float(tp2),
             "tp3" : float(tp3),
-            "stop_loss" : float(stop_loss),
+            "stop_loss" : float(manual_sl),
+            # "stop_loss" : float(stop_loss),
             "magic":magic,
             "comment":comment,
             "action": "mod",
